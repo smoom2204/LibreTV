@@ -192,7 +192,7 @@ const AGGREGATED_SEARCH_CONFIG = {
 const API_CONFIG = {
     search: {
         // 只拼接参数部分，不再包含 /api.php/provide/vod/
-        path: '?ac=videolist&wd=',
+        path: '/api.php/provide/vod/?ac=videolist&wd=',
         pagePath: '/api.php/provide/vod/?ac=videolist&wd={query}&pg={page}',
         maxPages: 50, // 最大获取页数
         headers: {

@@ -535,5 +535,26 @@
 
     <!-- 添加弹窗和URL搜索参数处理脚本 -->
     <script src="js/index-page.js"></script>
+		<script>
+//Get the button
+var mybutton = document.getElementById("myBtn");
+
+// 当用户从文档顶部向下滚动 20px 时，显示按钮
+window.onscroll = function() {scrollFunction()};
+
+function scrollFunction() {
+  if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+    mybutton.style.display = "block";
+  } else {
+    mybutton.style.display = "none";
+  }
+}
+
+// 当用户点击按钮时，滚动到文档顶部
+function topFunction() {
+  document.body.scrollTop = 0;
+  document.documentElement.scrollTop = 0;
+}
+</script>
 </body>
 </html>

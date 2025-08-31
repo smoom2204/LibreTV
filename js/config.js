@@ -35,18 +35,10 @@ const API_SITES = {
         api: 'https://wolongzyw.com',
         name: '卧龙资源',
     },
-    cjhw: {
-        api: 'https://cjhwba.com',
-        name: '新华为',
-    },
     jisu: {
         api: 'https://jszyapi.com',
         name: '极速资源',
         detail: 'https://jszyapi.com',
-    },
-    dbzy: {
-        api: 'https://dbzy.com',
-        name: '豆瓣资源',
     },
     bfzy: {
         api: 'https://bfzyapi.com',
@@ -78,11 +70,6 @@ const API_SITES = {
     mdzy: {
         api: 'https://91md.me',
         name: '🔞麻豆资源',
-        adult: true,
-    },
-	shayuzy: {
-        api: 'https://shayuzy.com',
-        name: '🔞鲨鱼资源',
         adult: true,
     },
 	apilj: {

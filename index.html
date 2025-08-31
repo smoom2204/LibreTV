@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>搜影视 - 搜你想看的影片</title>
-    <meta name="description" content="LibreTV是一个免费的在线视频搜索平台，无广告、安全，提供来自多个视频源的内容搜索与观看服务，无需注册即可使用。">
+    <meta name="description" content="搜影视是一个免费的在线视频搜索平台，无广告、安全，提供来自多个视频源的内容搜索与观看服务，无需注册即可使用。">
     <meta name="keywords" content="在线视频,免费视频,视频搜索,电影,电视剧,LibreTV">
     <meta name="author" content="LibreTV Team">
 
@@ -239,15 +239,15 @@
                     	        aria-label="微信" title="微信">
                     	        <i class="bi bi-wechat"></i> 
                     	</button>
-						
+						<!-- 
 						<button onclick="window.open('/chat/', '_blank')"
                     	        class="flex-1 bg-[#47724f] border-y border-[#333] text-white px-6 py-0 focus:outline-none transition-colors" 
                     	        aria-label="聊天" title="聊天室">
 						        <i class="bi bi-chat-dots-fill"></i>
                     	</button>
-						
+						 -->
 						<button onclick="window.open('https://t.me/sirenzhencangban', '_blank')"
-                    	        class="flex-1 bg-[#335339] border-y border-[#333] text-white px-6 py-0 focus:outline-none transition-colors" 
+                    	        class="flex-1 bg-[#47724f] border-y border-[#333] text-white px-6 py-0 focus:outline-none transition-colors" 
                     	        aria-label="飞机" title="飞机">
 						        <i class="bi bi-telegram"></i>
                     	</button>
@@ -270,7 +270,7 @@
 						<button onclick="window.open('http://jx.aisimu.cn/', '_blank')"
 						        class="flex-1 bg-[#335339] border-y border-[#333] text-white px-6 py-0 focus:outline-none transition-colors" 
 						        aria-label="解析" title="解析">
-                    	        解析
+                    	        艾搜
                     	        
 						</button>
 						
@@ -429,10 +429,10 @@
     <div id="passwordModal" class="fixed inset-0 bg-black/95 hidden items-center justify-center z-[65] transition-opacity duration-300">
         <div class="bg-[#111] p-8 rounded-lg w-11/12 max-w-md border border-[#333] max-h-[90vh] flex flex-col">
             <div class="flex justify-between items-center mb-6 flex-none">
-                <h2 class="text-2xl font-bold gradient-text">访问验证</h2>
+                <h2 class="text-2xl font-bold gradient-text">请输入密码继续访问</h2>
             </div>
             <div class="mb-6">
-                <p class="text-gray-300 mb-4">请输入密码继续访问</p>
+                <p class="text-gray-300 mb-4">（关注公众号：艾丝沐，发送：密码，获取）</p>
                 <form id="passwordForm" onsubmit="handlePasswordSubmit(); return false;">
                     <input type="text" name="username" id="username" autocomplete="username" style="display:none" tabindex="-1" aria-hidden="true">
                     <input type="password" id="passwordInput" class="w-full bg-[#111] border border-[#333] text-white px-4 py-3 rounded-lg focus:outline-none focus:border-white transition-colors" placeholder="密码..." autocomplete="new-password">

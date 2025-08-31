@@ -82,11 +82,6 @@ const API_SITES = {
         name: '🔞CK资源',
         adult: true,
     },
-    senlin: {
-        api: 'https://slapibf.com',
-        name: '🔞森林资源',
-        adult: true,
-    },
     didi: {
         api: 'https://api.ddapi.cc',
         name: '🔞滴滴资源',

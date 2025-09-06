@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>短剧搜索</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#165DFF',
+                        secondary: '#36CFC9',
+                        neutral: {
+                            100: '#F2F3F5',
+                            200: '#E5E6EB',
+                            300: '#C9CDD4',
+                            400: '#86909C',
+                            500: '#4E5969',
+                            600: '#272E3B',
+                            700: '#1D2129',
+                        }
+                    },
+                    fontFamily: {
+                        inter: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        'search': '0 4px 20px rgba(0, 0, 0, 0.08)',
+                        'search-hover': '0 6px 24px rgba(0, 0, 0, 0.12)',
+                    }
+                },
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .animate-float {
+                animation: float 6s ease-in-out infinite;
+            }
+            .text-balance {
+                text-wrap: balance;
+            }
+            .bg-gradient-sky {
+                background: linear-gradient(135deg, #f0f9ff 0%, #cfe8fc 100%);
+            }
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+
+        /* 新增弹窗样式 */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.active .modal-content {
+            transform: scale(1);
+        }
+
+        .modal-content h3 {
+            color: #165DFF;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .modal-content p {
+            color: #4E5969;
+            line-height: 1.6;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            font-size: 1.25rem;
+            color: #6B7280;
+            cursor: pointer;
+            background: transparent;
+            border: none;
+            transition: color 0.2s ease;
+        }
+
+        .close-btn:hover {
+            color: #165DFF;
+        }
+    </style>
+</head>
+<body class="font-inter bg-gray-50 text-neutral-700 min-h-screen flex flex-col">
+    <!-- 导航栏 -->
+  <nav id="navbar" class="fixed top-0 left-0 w-full py-4 px-6 bg-white shadow-sm transition-all duration-300 z-50">
+    <div class="max-w-7xl mx-auto flex justify-between items-center">
+      <div class="flex items-center space-x-2">
+        <i class="fa-solid fa-magnifying-glass text-primary text-2xl"></i>
+        <span class="text-xl font-bold text-neutral-700">短剧搜索</span>
+      </div>
+      
+      <!-- 桌面端导航 -->
+      <div class="hidden md:flex items-center space-x-6">
+          <a href="http://so.aisimu.cn/" class="text-neutral-500 hover:text-primary transition-colors duration-200">搜影视</a>
+        <a href="javascript:void(0)" onclick="openModal('newsModal')" class="text-neutral-500 hover:text-primary transition-colors duration-200">新闻</a>
+        <a href="javascript:void(0)" onclick="openModal('aboutModal')" class="text-neutral-500 hover:text-primary transition-colors duration-200">关于</a>
+        <a href="javascript:void(0)" onclick="openModal('loginModal')" class="text-neutral-500 hover:text-primary transition-colors duration-200">登录</a>
+      </div>
+      
+      <!-- 移动端菜单按钮 -->
+      <button id="menuBtn" class="md:hidden text-neutral-700 focus:outline-none">
+        <i class="fa-solid fa-bars text-xl"></i>
+      </button>
+    </div>
+    
+    <!-- 移动端菜单 -->
+    <div id="mobileMenu" class="md:hidden fixed inset-0 bg-white transform translate-x-full opacity-0 menu-transition z-50 pt-20 px-6">
+      <div class="flex flex-col space-y-6">
+        <!-- 原导航链接 -->
+        <a href="/" class="text-neutral-700 hover:text-primary text-lg py-2 border-b border-neutral-200">搜影视</a>
+        <a href="javascript:void(0)" onclick="closeMenu(); openModal('newsModal')" class="text-neutral-700 hover:text-primary text-lg py-2 border-b border-neutral-200">新闻</a>
+        <a href="javascript:void(0)" onclick="closeMenu(); openModal('aboutModal')" class="text-neutral-700 hover:text-primary text-lg py-2 border-b border-neutral-200">关于</a>
+        <a href="javascript:void(0)" onclick="closeMenu(); openModal('loginModal')" class="text-neutral-700 hover:text-primary text-lg py-2 border-b border-neutral-200">登录</a>
+        
+        <!-- 页脚链接 -->
+        <div class="mt-6 pt-6 border-t border-neutral-200">
+          <a href="javascript:void(0)" onclick="closeMenu(); openModal('privacyModal')" class="text-neutral-500 hover:text-primary text-sm py-2 block">隐私政策</a>
+          <a href="javascript:void(0)" onclick="closeMenu(); openModal('termsModal')" class="text-neutral-500 hover:text-primary text-sm py-2 block">使用条款</a>
+          <a href="javascript:void(0)" onclick="closeMenu(); openModal('helpModal')" class="text-neutral-500 hover:text-primary text-sm py-2 block">帮助中心</a>
+        </div>
+      </div>
+      
+      <!-- 关闭按钮 -->
+      <button id="closeMenuBtn" class="absolute top-6 right-6 text-neutral-700 focus:outline-none">
+        <i class="fa-solid fa-times text-xl"></i>
+      </button>
+    </div>
+  </nav>
+
+    <!-- 主要内容 -->
+    <main class="flex-grow flex flex-col items-center justify-center px-4 py-12 md:py-20">
+        <div class="text-center mb-10">
+            <div class="inline-block mb-6 animate-float">
+                <i class="fa-solid fa-magnifying-glass text-primary text-[clamp(4rem,10vw,6rem)]"></i>
+            </div>
+            <h1 class="text-[clamp(1.8rem,4vw,2.8rem)] font-bold text-neutral-700 mb-3">短剧搜索</h1>
+            <p class="text-neutral-500 max-w-2xl mx-auto text-balance">快速、安全地查找你需要的短剧，享受简洁高效的看剧体验</p>
+        </div>
+
+        <!-- 搜索框 -->
+        <div class="w-full max-w-3xl mb-12">
+            <div class="relative group">
+                <input type="text" placeholder="输入关键词开始搜索..." 
+                       class="w-full py-4 px-5 pr-14 rounded-full border border-neutral-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all duration-300 shadow-search group-hover:shadow-search-hover text-lg placeholder-neutral-400"
+                       id="search-input">
+                <button class="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full flex items-center justify-center bg-primary text-white hover:bg-primary/90 transition-colors duration-200"
+                        id="search-button">
+                    <i class="fa fa-search"></i>
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- 页脚 -->
+  <footer class="bg-white border-t border-neutral-200 py-6 px-6 md:px-10">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center">
+      <div class="text-neutral-500 text-sm mb-4 md:mb-0">
+        © 2025 短剧搜索 so.aisimu.cn
+      </div>
+      <div class="flex space-x-6">
+        <!-- 移动端已整合到菜单中，桌面端保留 -->
+        <a href="javascript:void(0)" onclick="openModal('privacyModal')" class="hidden md:block text-neutral-500 hover:text-primary transition-colors duration-200 text-sm">隐私政策</a>
+        <a href="javascript:void(0)" onclick="openModal('termsModal')" class="hidden md:block text-neutral-500 hover:text-primary transition-colors duration-200 text-sm">使用条款</a>
+        <a href="javascript:void(0)" onclick="openModal('helpModal')" class="hidden md:block text-neutral-500 hover:text-primary transition-colors duration-200 text-sm">帮助中心</a>
+      </div>
+    </div>
+  </footer>
+
+
+    <!-- 新闻弹窗 -->
+    <div id="newsModal" class="modal-overlay">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal('newsModal')">&times;</button>
+            <h3>没有新闻</h3>
+            <p>新闻跟短剧毛关系没有！！！</p>
+        </div>
+    </div>
+
+    <!-- 关于弹窗 -->
+    <div id="aboutModal" class="modal-overlay">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal('aboutModal')">&times;</button>
+            <h3>关于本站</h3>
+            <p>本平台不存储视频和图片. 只提供搜索和展示等服务. 资源来自互联网.</p>
+        </div>
+    </div>
+
+    <!-- 登录弹窗 -->
+    <div id="loginModal" class="modal-overlay">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal('loginModal')">&times;</button>
+            <h3>免登录</h3>
+            <!--div class="mt-4 space-y-3">
+                <input type="text" placeholder="手机号/用户名" class="w-full py-2 px-3 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all">
+                <input type="password" placeholder="密码" class="w-full py-2 px-3 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all">
+                <button class="w-full py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors">登录</button>
+                <div class="flex justify-between text-sm text-neutral-500">
+                    <span>记住密码</span>
+                    <a href="#" class="text-primary hover:underline">忘记密码？</a>
+                </div>
+            </div-->
+        </div>
+    </div>
+
+    <!-- 隐私政策弹窗 -->
+    <div id="privacyModal" class="modal-overlay">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal('privacyModal')">&times;</button>
+            <h3>隐私政策</h3>
+            <div class="text-left mt-4 text-sm text-neutral-600 max-h-60 overflow-y-auto">
+                <p class="mb-4">大家都是在互联网上裸奔，不存在隐私！</p>
+                <p class="mb-2">但本站不用登录、没有数据库、不会记录用户cookiy等行为！</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 使用条款弹窗 -->
+    <div id="termsModal" class="modal-overlay">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal('termsModal')">&times;</button>
+            <h3>使用条款</h3>
+            <div class="text-left mt-4 text-sm text-neutral-600 max-h-60 overflow-y-auto">
+                <p class="mb-2">欢迎使用短剧搜索平台服务！在使用本平台服务之前，请您仔细阅读以下使用条款。您使用本平台的服务即表示您同意接受本使用条款的约束。如果您不同意本使用条款的任何内容，请勿使用本平台的服务。</p>
+                <p class="mb-2">1. 服务条款的接受</p>
+                <p class="mb-4">通过使用本平台服务，您即表示同意接受本服务条款的全部条款和条件。如果您不同意本服务条款的任何条款，您应立即停止使用本平台服务。</p>
+                <p class="mb-2">2. 服务说明</p>
+                <p class="mb-4">本平台通过互联网为用户提供短剧搜索、推荐等服务。用户必须自行配备上网的所需设备，包括个人电脑、调制解调器或其他必备上网装置。</p>
+                <p class="mb-2">3. 用户账号、密码和安全</p>
+                <p class="mb-4">本站不存在注册或登录账号功能，不用担心信息安全问题。</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 帮助中心弹窗 -->
+    <div id="helpModal" class="modal-overlay">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal('helpModal')">&times;</button>
+            <h3>帮助中心</h3>
+            <div class="text-left mt-4 space-y-4">
+                <div>
+                    <h4 class="font-medium text-neutral-800 mb-1">如何搜索短剧？</h4>
+                    <p class="text-sm text-neutral-600">在搜索框中输入短剧名称、主演、导演等关键词，点击搜索按钮即可查找相关短剧。</p>
+                </div>
+                <div>
+                    <h4 class="font-medium text-neutral-800 mb-1">如何查看历史记录？</h4>
+                    <p class="text-sm text-neutral-600">查看您浏览器的历史记录，除此之外没办法查看您的搜索历史和浏览记录。</p>
+                </div>
+                <div>
+                    <h4 class="font-medium text-neutral-800 mb-1">遇到播放问题怎么办？</h4>
+                    <p class="text-sm text-neutral-600">1. 检查网络连接是否稳定；2. 重新点击你要观看的剧集；3. 尝试刷新页面；4. 清除浏览器缓存。</p>
+                </div>
+                <div>
+                    <h4 class="font-medium text-neutral-800 mb-1">如何反馈问题？</h4>
+                    <p class="text-sm text-neutral-600">抱歉，没有反馈渠道。</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DOM元素
+        const searchInput = document.getElementById('search-input');
+        const searchButton = document.getElementById('search-button');
+        const navbar = document.getElementById('navbar');
+        
+        
+    // 导航栏滚动效果
+    window.addEventListener('scroll', function() {
+      const navbar = document.getElementById('navbar');
+      if (window.scrollY > 10) {
+        navbar.classList.add('nav-shadow');
+        navbar.classList.add('py-3');
+        navbar.classList.remove('py-4');
+      } else {
+        navbar.classList.remove('nav-shadow');
+        navbar.classList.add('py-4');
+        navbar.classList.remove('py-3');
+      }
+    });
+
+    // 移动端菜单
+    const menuBtn = document.getElementById('menuBtn');
+    const closeMenuBtn = document.getElementById('closeMenuBtn');
+    const mobileMenu = document.getElementById('mobileMenu');
+
+    menuBtn.addEventListener('click', function() {
+      mobileMenu.classList.remove('translate-x-full', 'opacity-0');
+      mobileMenu.classList.add('translate-x-0', 'opacity-100');
+      document.body.style.overflow = 'hidden'; // 禁止背景滚动
+    });
+
+    function closeMenu() {
+      mobileMenu.classList.add('translate-x-full', 'opacity-0');
+      mobileMenu.classList.remove('translate-x-0', 'opacity-100');
+      document.body.style.overflow = ''; // 恢复背景滚动
+    }
+
+    closeMenuBtn.addEventListener('click', closeMenu);
+
+    // 模态框控制
+    function openModal(modalId) {
+      const modal = document.getElementById(modalId);
+      modal.classList.remove('hidden');
+      document.body.style.overflow = 'hidden'; // 禁止背景滚动
+    }
+
+    function closeModal(modalId) {
+      const modal = document.getElementById(modalId);
+      modal.classList.add('hidden');
+      document.body.style.overflow = ''; // 恢复背景滚动
+    }
+        
+        // 搜索按钮点击事件
+        searchButton.addEventListener('click', () => {
+            performSearch();
+        });
+        
+        //搜索输入框回车键事件
+        searchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+               performSearch();
+            }
+        });
+        
+        // 执行搜索
+        function performSearch() {
+            const query = searchInput.value.trim();
+            if (query) {
+                // 编码搜索词以确保URL安全
+                const encodedQuery = encodeURIComponent(query);
+                // 在新窗口打开搜索链接
+                window.open(`search.php?name=${encodedQuery}`, '_blank');
+            }
+        }
+        
+        // 新增弹窗控制函数
+        function openModal(modalId) {
+            const modal = document.getElementById(modalId);
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden'; // 防止背景滚动
+            
+            // 添加键盘事件监听
+            document.addEventListener('keydown', handleKeydown);
+            
+            function handleKeydown(e) {
+                if (e.key === 'Escape') {
+                    closeModal(modalId);
+                    document.removeEventListener('keydown', handleKeydown);
+                }
+            }
+        }
+
+        function closeModal(modalId) {
+            const modal = document.getElementById(modalId);
+            modal.classList.remove('active');
+            document.body.style.overflow = ''; // 恢复背景滚动
+        }
+
+        // 点击蒙版关闭弹窗
+        document.querySelectorAll('.modal-overlay').forEach(overlay => {
+            overlay.addEventListener('click', (e) => {
+                if (e.target === overlay) {
+                    const modalId = e.target.id;
+                    closeModal(modalId);
+                }
+            });
+        });
+    </script>
+</body>
+</html>    

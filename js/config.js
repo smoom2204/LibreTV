@@ -13,10 +13,10 @@ const PASSWORD_CONFIG = {
 
 // 网站信息配置
 const SITE_CONFIG = {
-    name: 'LibreTV',
-    url: 'https://libretv.is-an.org',
+    name: '搜影视',
+    url: 'http://so.aisimu.cn/',
     description: '免费在线视频搜索与观看平台',
-    logo: 'image/logo.png',
+    logo: '/so.svg',
     version: '1.0.3'
 };
 
